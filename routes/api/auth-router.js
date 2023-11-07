@@ -1,41 +1,55 @@
-const express = require("express");
+const express = require('express');
 
-const authController = require("../../controllers/auth-controller");
+const authController = require('../../controllers/auth-controller');
 
-const isEmptyBody = require("../../middlewares/isEmptyBody");
-const validateBody = require("../../decorators/validateBody");
+const isEmptyBody = require('../../middlewares/isEmptyBody');
+const validateBody = require('../../decorators/validateBody');
 
-const { userSignupSchema, userSigninSchema } = require("../../models/User");
+const {
+  userSignupSchema,
+  userSigninSchema,
+  userEmailSchema,
+} = require('../../models/User');
 
 const userSignupValidate = validateBody(userSignupSchema);
 const userSigninValidate = validateBody(userSigninSchema);
-const authenticate = require("../../middlewares/authenticate");
-const upload = require("../../middlewares/upload");
+const userEmailValidate = validateBody(userEmailSchema);
+const authenticate = require('../../middlewares/authenticate');
+const upload = require('../../middlewares/upload');
 
 const authRouter = express.Router();
 
 authRouter.post(
-  "/signup",
+  '/signup',
   isEmptyBody,
   userSignupValidate,
   authController.signup
 );
 
+authRouter.get('/verify/:verificationCode', authController.verify);
+
 authRouter.post(
-  "/signin",
+  '/signin',
   isEmptyBody,
   userSigninValidate,
   authController.signin
 );
 
-authRouter.get("/current", authenticate, authController.getCurrent);
+authRouter.post(
+  '/verify',
+  isEmptyBody,
+  userEmailValidate,
+  authController.resendVerifyEmail
+);
 
-authRouter.post("/signout", authenticate, authController.signout);
+authRouter.get('/current', authenticate, authController.getCurrent);
+
+authRouter.post('/signout', authenticate, authController.signout);
 
 authRouter.patch(
-  "/avatars",
+  '/avatars',
   authenticate,
-  upload.single("avatar"),
+  upload.single('avatar'),
   authController.updateAvatar
 );
 
