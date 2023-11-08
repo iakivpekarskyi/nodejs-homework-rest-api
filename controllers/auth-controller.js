@@ -52,7 +52,7 @@ const verify = async (req, res) => {
   const { verificationCode } = req.params;
   const user = await User.findOne({ verificationCode });
   if (!user) {
-    throw HttpError(404);
+    throw HttpError(404, ' User not found');
   }
   await User.findByIdAndUpdate(user._id, {
     verify: true,
@@ -70,7 +70,7 @@ const resendVerifyEmail = async (req, res) => {
     throw HttpError(404, ' Email not found');
   }
   if (user.verify) {
-    throw HttpError(400, ' Email already veify');
+    throw HttpError(400, ' Email already is verified');
   }
 
   const verifyEmail = {
